@@ -1,0 +1,33 @@
+cabal-version:      2.2
+category:           Control
+build-type:         Simple
+
+name:               perfect-vector-shuffle
+version:            0.1.0
+
+author:             Callan McGill
+maintainer:         callan.mcgill@gmail.com
+copyright:          2018
+license:            BSD-3-Clause
+
+
+extra-source-files:
+
+Library
+
+  hs-source-dirs:   src
+
+  ghc-options:      -Wall
+
+  build-depends:    base        >=4.7 && < 5
+                  , MonadRandom >= 0.5.1.1 && < 1
+                  , primitive   >= 0.6.4.0 && < 1
+                  , random      >= 1.1 && < 2 
+                  , vector      >= 0.12 && < 1
+
+  exposed-modules:  Immutable.Shuffle
+                    Mutable.Shuffle
+
+  other-modules:
+
+  default-language: Haskell2010
