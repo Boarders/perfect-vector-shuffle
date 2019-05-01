@@ -22,12 +22,39 @@ Library
   build-depends:    base        >= 4.7     && < 5
                   , MonadRandom >= 0.5.1.1 && < 1
                   , primitive   >= 0.6.4.0 && < 1
-                  , random      >= 1.1     && < 2 
+                  , random      >= 1.1     && < 2
                   , vector      >= 0.12    && < 1
 
   exposed-modules:  Immutable.Shuffle
                     Mutable.Shuffle
 
   other-modules:
+
+  default-language: Haskell2010
+
+
+Test-Suite testsuite
+
+  type:             exitcode-stdio-1.0
+
+  main-is:          Test.hs
+
+  hs-source-dirs:   test
+
+  ghc-options:      -Wall
+                    -Wincomplete-patterns
+
+  build-depends:    perfect-vector-shuffle >=0.1     && < 1
+                  , base                   >=4.7     && < 5
+                  , QuickCheck             >= 2.12.6 && < 3
+                  , random                 >= 1.1    && < 2
+                  , tasty                  >= 1.2    && < 2
+                  , tasty-quickcheck       >= 0.10   && < 1
+                  , vector                 >= 0.12   && < 1
+                  , quickcheck-instances   >= 0.3.19 && < 1
+
+
+  other-modules:
+                    Immutable.Test
 
   default-language: Haskell2010
