@@ -13,7 +13,7 @@ import           Test.QuickCheck.Instances.Vector ()
 import           Test.QuickCheck.Monadic
 import           Test.Tasty
 import           Test.Tasty.QuickCheck            as QC hiding (shuffle)
-import           Test.Tasty.QuickCheck            hiding (shuffle)
+
 
 testSuite :: TestTree
 testSuite = testGroup ""
