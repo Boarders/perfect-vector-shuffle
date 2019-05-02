@@ -1,4 +1,9 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+
+-- | This module provides functions to perform shuffles on immutable vectors.
+-- The shuffling is uniform amongst all permuations and performs the minimal
+-- number of transpositions.
+
 module Immutable.Shuffle where
 
 import           Control.Monad.Primitive
@@ -11,7 +16,7 @@ import           System.Random           (RandomGen (..))
 
 
 -- |
--- Perform a perfect shuffle on an input immutable vector v with a given random generator.
+-- Perform a shuffle on an immutable vector with a given random generator returning a shuffled vector and a new generator.
 shuffle :: forall a g. RandomGen g => Vector a -> g -> (Vector a, g)
 shuffle v g
   | length v <= 1 = (v, snd . next $ g)
@@ -25,7 +30,7 @@ shuffle v g
 
 
 -- |
--- Perform a perfect shuffle on an input immutable vector in a monad which has a source of randomness.
+-- Perform a shuffle on an input immutable vector in a monad which has a source of randomness.
 shuffleM :: forall m a . (MonadRandom m, PrimMonad m) => Vector a -> m (Vector a)
 shuffleM v
   | length v <= 1 = pure v
