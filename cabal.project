@@ -6,4 +6,4 @@ documentation:            True
 haddock-hyperlink-source: True
 
 package *
-documentation: True
+  documentation: True
