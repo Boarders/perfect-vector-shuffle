@@ -26,22 +26,23 @@ description:
         import Data.Vector
         import Immutable.Shuffle
         .
+        myVector :: Vector Int
+        myVector = fromList [1..10]
+        .
         shuffleMyVector :: IO (Vector Int)
         shuffleMyVector = shuffleM myVector
-        .
-        myVector = fromList [1..10]
     @
     .
     This gives the following:
     .
-    >>> shuffleMyVector
-    .
-    @[1,10,4,7,2,3,5,9,8,6]@
-    .
-    >>> shuffleMyVector
-    .
-    @[7,4,2,10,9,8,6,5,1,3]@
+    @
+    > shuffleMyVector
+    [1,10,4,7,2,3,5,9,8,6]
+    > shuffleMyVector
+    [7,4,2,10,9,8,6,5,1,3]
+    @
 
+extra-source-files: CHANGELOG.md
 
 source-repository head
   type:     git
