@@ -17,39 +17,33 @@ import           Test.Tasty.QuickCheck            as QC hiding (shuffle)
 
 testSuite :: TestTree
 testSuite = testGroup ""
-  [ localOption (QuickCheckTests 1000) shuffleTestSuite
-  , localOption (QuickCheckTests 1000) shuffleMTestSuite
+  [ localOption (QuickCheckTests 10000) shuffleIOTestSuite
+  , localOption (QuickCheckTests 10   ) performanceTest
   ]
 
+performanceTest :: TestTree
+performanceTest = testGroup "Performance"
+  [ QC.testProperty
+      "Shuffling preserves length and elements"
+      (monadicIO . sameLength)]
 
-shuffleTestSuite :: TestTree
-shuffleTestSuite = testGroup "shuffle"
+shuffleIOTestSuite :: TestTree
+shuffleIOTestSuite = testGroup "shuffleIO"
   [ QC.testProperty
       "Shuffling preserves length and elements"
       (monadicIO . isPermutation @Int)]
 
-
-shuffleMTestSuite :: TestTree
-shuffleMTestSuite = testGroup "shuffleM"
-  [ QC.testProperty
-      "Shuffling preserves length and elements"
-      (monadicIO . isPermutationM @Int)]
+sameLength :: () -> PropertyM IO Property
+sameLength _ = do
+    let v :: Vector Int = V.fromList [1..1000000]
+    v' <- run $ shuffleIO v
+    pure $ length v === length v'
 
 
 isPermutation :: forall a . (Ord a , Show a, Arbitrary a) => Vector a -> PropertyM IO Property
 isPermutation v =
   do
-    gen <- run $ getStdGen
-    let v' = fst $ shuffle v gen
-    let ls  = V.toList v
-    let ls' = V.toList v'
-    pure $ (sort ls) === (sort ls')
-
-
-isPermutationM :: forall a . (Ord a , Show a, Arbitrary a) => Vector a -> PropertyM IO Property
-isPermutationM v =
-  do
-    v'  <- run $ shuffleM v
+    v'  <- run $ shuffleIO v
     let ls  = V.toList v
     let ls' = V.toList v'
     pure $ (sort ls) === (sort ls')

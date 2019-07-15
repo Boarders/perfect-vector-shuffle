@@ -58,8 +58,10 @@ Library
   build-depends:    base        ^>= 4.12.0.0
                   , MonadRandom >= 0.5.1.1  && < 0.6
                   , primitive   >= 0.6.4.0  && < 0.7
+                  , mwc-random  ^>= 0.14.0
                   , random      ^>= 1.1
                   , vector      >= 0.12.0   && < 0.13
+                  , random-shuffle
 
   exposed-modules:  Immutable.Shuffle
                     Mutable.Shuffle
