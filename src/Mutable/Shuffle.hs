@@ -13,6 +13,7 @@ import           Data.Vector.Mutable
 import           Prelude                 hiding (length, tail)
 import           System.Random           (RandomGen)
 import qualified System.Random           as SR
+import Control.Monad.ST
 
 -- |
 -- Perform a shuffle on a mutable vector with a given random generator, returning a new random generator.
@@ -22,16 +23,17 @@ shuffle
     , RandomGen g
     )
   => MVector (PrimState m) a -> g -> m g
+{-# INLINABLE shuffle #-}
 shuffle mutV gen = go mutV gen (length mutV - 1)
   where
     go :: MVector (PrimState m) a -> g -> Int -> m g
+    {-# INLINE go #-}
     go _ g 0   =  pure g
     go v g maxInd =
       do
         let (ind, newGen) :: (Int, g) = SR.randomR (0, maxInd) g
         swap v 0 ind
         go (tail v) newGen (maxInd - 1)
-
 
 -- |
 -- Perform a shuffle on a mutable vector in a monad which has a source of randomness.
@@ -41,9 +43,11 @@ shuffleM
     , MonadRandom m
     )
   => MVector (PrimState m) a  -> m ()
+{-# INLINABLE shuffleM #-}
 shuffleM mutV = go mutV (length mutV - 1)
   where
     go :: MVector (PrimState m) a -> Int -> m ()
+    {-# INLINE go #-}
     go _ 0   =  pure ()
     go v maxInd =
       do
@@ -51,4 +55,4 @@ shuffleM mutV = go mutV (length mutV - 1)
         swap v 0 ind
         go (tail v) (maxInd - 1)
 
-
+{-# SPECIALISE shuffleM :: MVector RealWorld a -> IO () #-}
