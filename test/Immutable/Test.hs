@@ -79,7 +79,7 @@ isPermutationM v =
 isPermutation :: forall a . (Ord a , Show a, Arbitrary a) => Vector a -> PropertyM IO Property
 isPermutation v =
   do
-    g        <- run $ getStdGen
+    g        <- run getStdGen
     let (v', _) = shuffle v g
     let ls  = V.toList v
     let ls' = V.toList v'
@@ -105,7 +105,7 @@ isMaximalCycleM (Positive n) =
 isMaximalCycle :: Positive Int -> PropertyM IO Property
 isMaximalCycle (Positive n) =
   do
-    g      <- run $ getStdGen
+    g      <- run getStdGen
     let (v, _) = maximalCycle (V.fromList [0..n]) g
     pure $ cycleLength v === (n + 1)
 
@@ -132,7 +132,7 @@ isDerangementM (Positive n) =
 isDerangement :: Positive Int -> PropertyM IO Property
 isDerangement (Positive n) =
   do
-    g      <- run $ getStdGen
+    g      <- run getStdGen
     let (v, _)  = derangement (V.fromList [0.. n]) g
     let perm    = V.indexed v
     let unmoved = V.filter (uncurry (==)) perm
