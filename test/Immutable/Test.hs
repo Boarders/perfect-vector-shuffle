@@ -8,11 +8,11 @@ import           Data.List                        (sort)
 import           Data.Vector                      (Vector, (!))
 import qualified Data.Vector                      as V
 import           Immutable.Shuffle
+import           System.Random
 import           Test.QuickCheck.Instances.Vector ()
 import           Test.QuickCheck.Monadic
 import           Test.Tasty
 import           Test.Tasty.QuickCheck            as QC hiding (shuffle)
-import System.Random
 
 
 testSuite :: TestTree
