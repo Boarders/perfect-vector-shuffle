@@ -12,11 +12,12 @@ import           Test.QuickCheck.Instances.Vector ()
 import           Test.QuickCheck.Monadic
 import           Test.Tasty
 import           Test.Tasty.QuickCheck            as QC hiding (shuffle)
+import System.Random
 
 
 testSuite :: TestTree
 testSuite = testGroup ""
-  [ localOption (QuickCheckTests 10000) shuffleMTestSuite
+  [ localOption (QuickCheckTests 10000) shuffleTestSuite
   , localOption (QuickCheckTests 0    ) performanceTest
   , localOption (QuickCheckTests 10000) maximalCycleTestSuite
   , localOption (QuickCheckTests 10000) derangementTestSuite
@@ -28,24 +29,36 @@ performanceTest = testGroup "Performance"
       "Shuffling preserves length and elements"
       (monadicIO . sameLength)]
 
-shuffleMTestSuite :: TestTree
-shuffleMTestSuite = testGroup "shuffleM"
+shuffleTestSuite :: TestTree
+shuffleTestSuite = testGroup "shuffleM"
   [ QC.testProperty
-      "Shuffling preserves length and elements"
-      (monadicIO . isPermutation @Int)]
+      "shuffleM: Shuffling preserves length and elements"
+       (monadicIO . isPermutationM @Int)
+  , QC.testProperty
+      "shuffle: Shuffling preserves length and elements"
+       (monadicIO . isPermutation  @Int)
+  ]
 
 maximalCycleTestSuite :: TestTree
 maximalCycleTestSuite = testGroup "maximalCycleM"
   [ QC.testProperty
-      "maximal cycle does indeed produce a maximal cycle on [0..n]"
-      (monadicIO . isMaximalCycle)]
+      "maximalCycleM: maximal cycle does indeed produce a maximal cycle on [0..n]"
+      (monadicIO . isMaximalCycleM)
+  , QC.testProperty
+      "maximalCycle: maximal cycle does indeed produce a maximal cycle on [0..n]"
+      (monadicIO . isMaximalCycle)
+  ]
 
 
 derangementTestSuite :: TestTree
 derangementTestSuite = testGroup "derangementM"
   [ QC.testProperty
-      "derangement does indeed produce a derangment on [0..n]."
-      (monadicIO . isDerangement)]
+      "derangementM: derangement does indeed produce a derangment on [0..n]."
+      (monadicIO . isDerangementM)
+  , QC.testProperty
+      "derangement: derangement does indeed produce a derangment on [0..n]."
+      (monadicIO . isDerangement)
+  ]
 
 sameLength :: () -> PropertyM IO Property
 sameLength _ = do
@@ -54,8 +67,8 @@ sameLength _ = do
     pure $ length v === length v'
 
 
-isPermutation :: forall a . (Ord a , Show a, Arbitrary a) => Vector a -> PropertyM IO Property
-isPermutation v =
+isPermutationM :: forall a . (Ord a , Show a, Arbitrary a) => Vector a -> PropertyM IO Property
+isPermutationM v =
   do
     v'  <- run $ shuffleM v
     let ls  = V.toList v
@@ -63,8 +76,18 @@ isPermutation v =
     pure $ sort ls === sort ls'
 
 
-isMaximalCycle :: Positive Int -> PropertyM IO Property
-isMaximalCycle (Positive n) =
+isPermutation :: forall a . (Ord a , Show a, Arbitrary a) => Vector a -> PropertyM IO Property
+isPermutation v =
+  do
+    g        <- run $ getStdGen
+    let (v', _) = shuffle v g
+    let ls  = V.toList v
+    let ls' = V.toList v'
+    pure $ sort ls === sort ls'
+
+
+isMaximalCycleM :: Positive Int -> PropertyM IO Property
+isMaximalCycleM (Positive n) =
   do
     v <- run $ maximalCycleM (V.fromList [0..n])
     pure $ cycleLength v === (n + 1)
@@ -79,10 +102,38 @@ isMaximalCycle (Positive n) =
                      else
                        1 + go (xs ! k) xs
 
+isMaximalCycle :: Positive Int -> PropertyM IO Property
+isMaximalCycle (Positive n) =
+  do
+    g      <- run $ getStdGen
+    let (v, _) = maximalCycle (V.fromList [0..n]) g
+    pure $ cycleLength v === (n + 1)
+
+   where
+     cycleLength :: Vector Int -> Int
+     cycleLength v = go (V.head v) v
+
+     go :: Int -> Vector Int -> Int
+     go k xs = if k == 0
+                       then 1
+                     else
+                       1 + go (xs ! k) xs
+
+
+isDerangementM :: Positive Int -> PropertyM IO Property
+isDerangementM (Positive n) =
+  do
+    v <- run $ derangementM (V.fromList [0.. n])
+    let perm    = V.indexed v
+    let unmoved = V.filter (uncurry (==)) perm
+    pure $ null unmoved === True
+
+
 isDerangement :: Positive Int -> PropertyM IO Property
 isDerangement (Positive n) =
   do
-    v <- run $ derangementM (V.fromList [0.. n])
+    g      <- run $ getStdGen
+    let (v, _)  = derangement (V.fromList [0.. n]) g
     let perm    = V.indexed v
     let unmoved = V.filter (uncurry (==)) perm
     pure $ null unmoved === True
