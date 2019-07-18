@@ -167,18 +167,18 @@ derangement mutV gen = do
         if v_last_old == v_last_new then
           do
             unsafeCopy mutV c
-            go c mutV 0 (length mutV - 1)
+            go c mutV g 0 (length mutV - 1)
         else
           pure g
-    go c v g currInd maxInd =
+    go c v oldGen currInd maxInd =
       do
-        let (swapInd, newGen) :: (Int, g) = SR.randomR (0, maxInd) g
+        let (swapInd, newGen) :: (Int, g) = SR.randomR (0, maxInd) oldGen
         v_old  <- read c currInd
         v_ind  <- read v swapInd
         if v_old == v_ind then
           do
             unsafeCopy mutV c
-            go c mutV gen 0 (length mutV - 1)
+            go c mutV newGen 0 (length mutV - 1)
         else
           do
             swap v 0 swapInd
