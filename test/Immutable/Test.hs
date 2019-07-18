@@ -60,7 +60,7 @@ isPermutation v =
     v'  <- run $ shuffleM v
     let ls  = V.toList v
     let ls' = V.toList v'
-    pure $ (sort ls) === (sort ls')
+    pure $ sort ls === sort ls'
 
 
 isMaximalCycle :: Positive Int -> PropertyM IO Property
@@ -85,5 +85,5 @@ isDerangement (Positive n) =
     v <- run $ derangementM (V.fromList [0.. n])
     let perm    = V.indexed v
     let unmoved = V.filter (uncurry (==)) perm
-    pure $ (null unmoved) === True
-      
+    pure $ null unmoved === True
+

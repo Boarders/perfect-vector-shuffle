@@ -63,7 +63,7 @@ shuffleK k v
 -- Get a random sample of k elements without replacement from a vector.
 sampleWithoutReplacement :: forall m a . (MonadRandom m, PrimMonad m) => Int -> Vector a -> m (Vector a)
 {-# INLINEABLE sampleWithoutReplacement #-}
-sampleWithoutReplacement k v = take k <$> (shuffleK k v)
+sampleWithoutReplacement k v = take k <$> shuffleK k v
 
 
 -- |

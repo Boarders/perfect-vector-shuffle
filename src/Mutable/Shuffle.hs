@@ -10,7 +10,7 @@ module Mutable.Shuffle where
 import           Control.Monad.Primitive
 import           Control.Monad.Random    (MonadRandom (..))
 import           Data.Vector.Mutable
-import           Prelude                 hiding (length, tail, read)
+import           Prelude                 hiding (length, read, tail)
 import           System.Random           (RandomGen)
 import qualified System.Random           as SR
 
@@ -160,13 +160,22 @@ derangement mutV gen = do
   where
     go :: MVector (PrimState m) a -> MVector (PrimState m) a -> g -> Int -> Int -> m g
     {-# INLINE go #-}
-    go _ _ g _ 0            =  pure g
+    go c v g lastInd 0 =
+      do
+        v_last_old <- read c lastInd
+        v_last_new <- read v 0
+        if v_last_old == v_last_new then
+          do
+            unsafeCopy mutV c
+            go c mutV 0 (length mutV - 1)
+        else
+          pure g
     go c v g currInd maxInd =
       do
         let (swapInd, newGen) :: (Int, g) = SR.randomR (0, maxInd) g
         v_old  <- read c currInd
         v_ind  <- read v swapInd
-        if (v_old == v_ind) then
+        if v_old == v_ind then
           do
             unsafeCopy mutV c
             go c mutV gen 0 (length mutV - 1)
@@ -194,11 +203,11 @@ derangementM mutV = do
   where
     go :: MVector (PrimState m) a -> MVector (PrimState m) a -> Int -> Int -> m ()
     {-# INLINE go #-}
-    go c v lastInd 0            =
+    go c v lastInd 0 =
       do
         v_last_old <- read c lastInd
         v_last_new <- read v 0
-        if (v_last_old == v_last_new) then
+        if v_last_old == v_last_new then
           do
             unsafeCopy mutV c
             go c mutV 0 (length mutV - 1)
@@ -206,12 +215,12 @@ derangementM mutV = do
           pure ()
     go c v currInd maxInd =
       do
-        swapInd :: Int <- getRandomR (0, maxInd) 
+        swapInd :: Int <- getRandomR (0, maxInd)
         v_old  <- read c currInd
         v_ind  <- read v swapInd
-        if (v_old == v_ind) then
+        if v_old == v_ind then
           do
-            unsafeCopy mutV c 
+            unsafeCopy mutV c
             go c mutV 0 (length mutV - 1)
         else
           do
