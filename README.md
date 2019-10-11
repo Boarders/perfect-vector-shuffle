@@ -1,6 +1,6 @@
 ## `perfect-vector-shuffle`
 
-A library providing Fischer--Yates in-place shuffles and related functionality.
+A library providing Fisher--Yates in-place shuffles and related functionality.
 
 As an example of how to use it:
 
