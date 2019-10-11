@@ -75,7 +75,7 @@ Library
 
   ghc-options:      -Wall
                     -fexpose-all-unfoldings
-                    -fspecialize-aggressively
+                    -fspecialise-aggressively
 
   build-depends:    base        >= 4.9      && < 4.14
                   , MonadRandom >= 0.5.1.1  && < 0.6
@@ -101,7 +101,7 @@ Test-Suite testsuite
 
   ghc-options:      -Wall
                     -fexpose-all-unfoldings
-                    -fspecialize-aggressively
+                    -fspecialise-aggressively
                     -Wincomplete-patterns
 
   build-depends:    perfect-vector-shuffle ^>= 0.1.1
