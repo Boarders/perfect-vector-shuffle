@@ -30,7 +30,6 @@ script:
   - cabal new-configure --enable-benchmarks --enable-documentation --enable-tests --haddock-all --haddock-hyperlink-source --haddock-internal
   - cabal new-build     --enable-benchmarks --enable-documentation --enable-tests --haddock-all --haddock-hyperlink-source --haddock-internal
   - cabal new-test
-  - cabal new-haddock                
 
 notifications:
   email: false
