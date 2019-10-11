@@ -1,5 +1,7 @@
 ## `perfect-vector-shuffle`
 
+[![Build Status](https://travis-ci.com/Boarders/perfect-vector-shuffle.svg?branch=master)](https://travis-ci.com/Boarders/perfect-vector-shuffle)
+
 A library providing Fisher--Yates in-place shuffles and related functionality.
 
 As an example of how to use it:
