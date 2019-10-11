@@ -143,7 +143,7 @@ maximalCycleM mutV = go mutV (length mutV - 1)
 -- |
 -- Perform a [derangement](https://en.wikipedia.org/wiki/Derangement) on a mutable vector with a given random generator, returning a new random generator.
 --
--- Note: It is assumed the input vector consists of distinct values.
+-- __Note:__ It is assumed the input vector consists of distinct values.
 --
 -- This uses the "early refusal" algorithm.
 derangement
@@ -187,6 +187,8 @@ derangement mutV gen = do
 
 -- |
 -- Perform a [derangement](https://en.wikipedia.org/wiki/Derangement) on a mutable vector in a monad which has a source of randomness.
+--
+-- __Note:__ It is assumed the input vector consists of distinct values.
 --
 -- This uses the "early refusal" algorithm
 derangementM

@@ -123,7 +123,7 @@ isMaximalCycle (Positive n) =
 isDerangementM :: Positive Int -> PropertyM IO Property
 isDerangementM (Positive n) =
   do
-    v <- run $ derangementM (V.fromList [0.. n])
+    v <- run $ derangementM (V.fromList [0..n])
     let perm    = V.indexed v
     let unmoved = V.filter (uncurry (==)) perm
     pure $ null unmoved === True

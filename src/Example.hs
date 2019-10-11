@@ -4,11 +4,12 @@ import           Data.Vector
 import           Immutable.Shuffle
 
 main :: IO ()
-main =
-  do
-    shuffleMyVector >>= print
-    cycleMyVector   >>= print
-    derangeMyVector >>= print
+main = do
+{
+shuffleMyVector >>= print;
+cycleMyVector   >>= print;
+derangeMyVector >>= print;
+}
 
 myVector :: Vector Int
 myVector = fromList [1..10]

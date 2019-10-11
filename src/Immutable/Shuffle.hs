@@ -102,7 +102,7 @@ maximalCycleM v
 -- on an immutable vector with a given random generator, returning a new random
 -- generator.
 --
--- Note: It is assumed the input vector consists of distinct values.
+-- __Note:__ It is assumed the input vector consists of distinct values.
 --
 -- This uses the "early refusal" algorithm.
 derangement :: forall a g. (Eq a, RandomGen g) => Vector a -> g -> (Vector a, g)
@@ -120,6 +120,8 @@ derangement v g
 -- |
 -- Perform an in-place [derangement](https://en.wikipedia.org/wiki/Derangement) on
 -- an immutable vector in a monad which has a source of randomness.
+--
+-- __Note:__ It is assumed the input vector consists of distinct values.
 --
 -- This uses the "early refusal" algorithm.
 derangementM :: forall m a . (Eq a, MonadRandom m, PrimMonad m) => Vector a -> m (Vector a)
