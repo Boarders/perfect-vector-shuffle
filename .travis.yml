@@ -13,17 +13,33 @@ cache:
 
 matrix:
   include:
+    # Cabal
     - ghc: 8.2.2
     - ghc: 8.4.4
     - ghc: 8.6.5
 
+    #Stack
+    - ghc: 8.8.1
+      env: STACK_YAML="$TRAVIS_BUILD_DIR/stack.yaml"
 
 install:
   - gcc   --version
   - ghc   --version
-  - cabal --version
-  - cabal new-update
-  - cabal new-build     --enable-benchmarks --enable-documentation --enable-tests --haddock-all --haddock-hyperlink-source --haddock-internal --only-dependencies
+  - |
+    if [ -z "$STACK_YAML" ]; then
+      cabal --version
+      cabal new-update
+      cabal new-build     --enable-benchmarks --enable-documentation --enable-tests --haddock-all --haddock-hyperlink-source --haddock-internal --only-dependencies
+    else
+      #stack installation
+      curl -sSL https://get.haskellstack.org/ | sh
+      # build project with stack
+      stack --version
+      stack build --fast --system-ghc --bench --test --haddock --haddock-deps --haddock-hyperlink-source --haddock-internal --no-run-benchmarks --no-run-tests --verbosity warn
+    fi
+  
+
+  
 
 script:
   - cabal new-configure --enable-benchmarks --enable-documentation --enable-tests --haddock-all --haddock-hyperlink-source --haddock-internal
