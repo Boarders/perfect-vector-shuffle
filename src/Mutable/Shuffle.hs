@@ -8,11 +8,11 @@
 module Mutable.Shuffle where
 
 import           Control.Monad.Primitive
-import           Control.Monad.Random    (MonadRandom (..))
-import           Data.Vector.Mutable
-import           Prelude                 hiding (length, read, tail)
-import           System.Random           (RandomGen)
-import qualified System.Random           as SR
+import           Control.Monad.Random        (MonadRandom (..))
+import           Data.Vector.Generic.Mutable
+import           Prelude                     hiding (length, read, tail)
+import           System.Random               (RandomGen)
+import qualified System.Random               as SR
 
 
 -- |
@@ -20,17 +20,19 @@ import qualified System.Random           as SR
 --
 -- This uses the Fisher--Yates--Knuth algorithm
 shuffle
-  :: forall m a g
+  :: forall m a g v
   . ( PrimMonad m
     , RandomGen g
+    , MVector v a
     )
-  => MVector (PrimState m) a -> g -> m g
+  => v (PrimState m) a -> g -> m g
 {-# INLINABLE shuffle #-}
 shuffle mutV gen = go mutV gen (length mutV - 1)
   where
-    go :: MVector (PrimState m) a -> g -> Int -> m g
+    go :: v (PrimState m) a -> g -> Int -> m g
     {-# INLINE go #-}
-    go _ g 0   =  pure g
+    go _ g (- 1)  = pure g
+    go _ g 0      =  pure g
     go v g maxInd =
       do
         let (ind, newGen) :: (Int, g) = SR.randomR (0, maxInd) g
@@ -44,38 +46,41 @@ shuffle mutV gen = go mutV gen (length mutV - 1)
 --
 -- This uses the Fisher--Yates--Knuth algorithm
 shuffleM
-  :: forall m a
+  :: forall m a v
   . ( PrimMonad m
     , MonadRandom m
+    , MVector v a
     )
-  => MVector (PrimState m) a  -> m ()
+  => v (PrimState m) a  -> m ()
 {-# INLINABLE shuffleM #-}
 shuffleM mutV = go mutV (length mutV - 1)
   where
-    go :: MVector (PrimState m) a -> Int -> m ()
+    go :: v (PrimState m) a -> Int -> m ()
     {-# INLINE go #-}
-    go _ 0   =  pure ()
+    go _ (- 1)  = pure ()
+    go _ 0      = pure ()
     go v maxInd =
       do
         ind <-  getRandomR (0, maxInd)
         swap v 0 ind
         go (tail v) (maxInd - 1)
 
-{-# SPECIALISE shuffleM :: MVector RealWorld a -> IO () #-}
+-- {-# SPECIALISE shuffleM :: MVector RealWorld a -> IO () #-}
 
 -- |
 -- Shuffle the first k elements of a vector.
 --
 shuffleK
-  :: forall m a
+  :: forall m a v
   . ( PrimMonad m
     , MonadRandom m
+    , MVector v a
     )
-  => Int -> MVector (PrimState m) a  -> m ()
+  => Int -> v (PrimState m) a  -> m ()
 {-# INLINABLE shuffleK #-}
 shuffleK numberOfShuffles mutV = go mutV (numberOfShuffles - 1)
   where
-    go :: MVector (PrimState m) a -> Int -> m ()
+    go :: v (PrimState m) a -> Int -> m ()
     {-# INLINE go #-}
     go _ k | k < 0
       = error "Cannot pass negative value to ShuffleK"
@@ -95,16 +100,18 @@ shuffleK numberOfShuffles mutV = go mutV (numberOfShuffles - 1)
 --
 -- This uses the Sattolo algorithm.
 maximalCycle
-  :: forall m a g
+  :: forall m a g v
   . ( PrimMonad m
     , RandomGen g
+    , MVector v a
     )
-  => MVector (PrimState m) a -> g -> m g
+  => v (PrimState m) a -> g -> m g
 {-# INLINABLE maximalCycle #-}
 maximalCycle mutV gen = go mutV gen (length mutV - 1)
   where
-    go :: MVector (PrimState m) a -> g -> Int -> m g
+    go :: v (PrimState m) a -> g -> Int -> m g
     {-# INLINE go #-}
+    go _ g (- 1)  =  pure g
     go _ g 0      =  pure g
     go v g maxInd =
       do
@@ -119,24 +126,26 @@ maximalCycle mutV gen = go mutV gen (length mutV - 1)
 --
 -- This uses the Sattolo algorithm.
 maximalCycleM
-  :: forall m a
+  :: forall m a v
   . ( PrimMonad m
     , MonadRandom m
+    , MVector v a
     )
-  => MVector (PrimState m) a  -> m ()
+  => v (PrimState m) a  -> m ()
 {-# INLINABLE maximalCycleM #-}
 maximalCycleM mutV = go mutV (length mutV - 1)
   where
-    go :: MVector (PrimState m) a -> Int -> m ()
+    go :: v (PrimState m) a -> Int -> m ()
     {-# INLINE go #-}
-    go _ 0   =  pure ()
+    go _ (- 1)  =  pure ()
+    go _ 0      =  pure ()
     go v maxInd =
       do
         ind <-  getRandomR (1, maxInd)
         swap v 0 ind
         go (tail v) (maxInd - 1)
 
-{-# SPECIALISE maximalCycleM :: MVector RealWorld a -> IO () #-}
+-- {-# SPECIALISE maximalCycleM :: MVector RealWorld a -> IO () #-}
 
 
 
@@ -147,19 +156,21 @@ maximalCycleM mutV = go mutV (length mutV - 1)
 --
 -- This uses the "early refusal" algorithm.
 derangement
-  :: forall m a g
+  :: forall m a g v
   . ( PrimMonad m
     , RandomGen g
     , Eq a
+    , MVector v a
     )
-  => MVector (PrimState m) a -> g -> m g
+  => v (PrimState m) a -> g -> m g
 {-# INLINABLE derangement #-}
 derangement mutV gen = do
   mutV_copy <- clone mutV
   go mutV_copy mutV gen 0 (length mutV - 1)
   where
-    go :: MVector (PrimState m) a -> MVector (PrimState m) a -> g -> Int -> Int -> m g
+    go :: v (PrimState m) a -> v (PrimState m) a -> g -> Int -> Int -> m g
     {-# INLINE go #-}
+    go _ _ g _ (- 1)   = pure g
     go c v g lastInd 0 =
       do
         v_last_old <- read c lastInd
@@ -192,19 +203,21 @@ derangement mutV gen = do
 --
 -- This uses the "early refusal" algorithm
 derangementM
-  :: forall m a
+  :: forall m a v
   . ( PrimMonad m
     , MonadRandom m
     , Eq a
+    , MVector v a
     )
-  => MVector (PrimState m) a -> m ()
+  => v (PrimState m) a -> m ()
 {-# INLINABLE derangementM #-}
 derangementM mutV = do
   mutV_copy <- clone mutV
   go mutV_copy mutV 0 (length mutV - 1)
   where
-    go :: MVector (PrimState m) a -> MVector (PrimState m) a -> Int -> Int -> m ()
+    go :: v (PrimState m) a -> v (PrimState m) a -> Int -> Int -> m ()
     {-# INLINE go #-}
+    go _ _ _  (- 1)  = pure ()
     go c v lastInd 0 =
       do
         v_last_old <- read c lastInd
