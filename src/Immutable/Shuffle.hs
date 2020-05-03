@@ -9,7 +9,7 @@ module Immutable.Shuffle where
 import           Control.Monad.Primitive
 import           Control.Monad.Random    (MonadRandom (..))
 import           Control.Monad.ST        (runST)
-import           Data.Vector
+import           Data.Vector.Generic
 import qualified Mutable.Shuffle         as MS
 import           Prelude                 hiding (length, take)
 import           System.Random           (RandomGen (..))
@@ -19,7 +19,7 @@ import           System.Random           (RandomGen (..))
 -- Perform a shuffle on an immutable vector with a given random generator returning a shuffled vector and a new generator.
 --
 -- This uses the Fisher--Yates--Knuth algorithm.
-shuffle :: forall a g. RandomGen g => Vector a -> g -> (Vector a, g)
+shuffle :: forall a g v. (RandomGen g, Vector v a) => v a -> g -> (v a, g)
 shuffle v g
   | length v <= 1 = (v, g)
   | otherwise     =
@@ -35,7 +35,7 @@ shuffle v g
 -- Perform a shuffle on an input immutable vector in a monad which has a source of randomness.
 --
 -- This uses the Fisher--Yates--Knuth algorithm.
-shuffleM :: forall m a . (MonadRandom m, PrimMonad m) => Vector a -> m (Vector a)
+shuffleM :: forall m a v . (MonadRandom m, PrimMonad m, Vector v a) => v a -> m (v a)
 shuffleM v
   | length v <= 1 = pure v
   | otherwise =
@@ -49,7 +49,7 @@ shuffleM v
 -- Perform a shuffle on the first k elements of a vector in a monad which has a
 -- source of randomness.
 --
-shuffleK :: forall m a . (MonadRandom m, PrimMonad m) => Int -> Vector a -> m (Vector a)
+shuffleK :: forall m a v. (MonadRandom m, PrimMonad m, Vector v a) => Int -> v a -> m (v a)
 shuffleK k v
   | length v <= 1 = pure v
   | otherwise =
@@ -61,7 +61,7 @@ shuffleK k v
 
 -- |
 -- Get a random sample of k elements without replacement from a vector.
-sampleWithoutReplacement :: forall m a . (MonadRandom m, PrimMonad m) => Int -> Vector a -> m (Vector a)
+sampleWithoutReplacement :: forall m a v . (MonadRandom m, PrimMonad m, Vector v a) => Int -> v a -> m (v a)
 {-# INLINEABLE sampleWithoutReplacement #-}
 sampleWithoutReplacement k v = take k <$> shuffleK k v
 
@@ -71,7 +71,7 @@ sampleWithoutReplacement k v = take k <$> shuffleK k v
 -- indices form a maximal cycle.
 --
 -- This uses the Sattolo algorithm.
-maximalCycle :: forall a g. RandomGen g => Vector a -> g -> (Vector a, g)
+maximalCycle :: forall a g v. (RandomGen g, Vector v a) => v a -> g -> (v a, g)
 maximalCycle v g
   | length v <= 1 = (v, g)
   | otherwise     =
@@ -87,7 +87,7 @@ maximalCycle v g
 -- indices form a maximal cycle in a monad with a source of randomness.
 --
 -- This uses the Sattolo algorithm.
-maximalCycleM :: forall m a . (MonadRandom m, PrimMonad m) => Vector a -> m (Vector a)
+maximalCycleM :: forall m a v . (MonadRandom m, PrimMonad m, Vector v a) => v a -> m (v a)
 maximalCycleM v
   | length v <= 1 = pure v
   | otherwise =
@@ -105,7 +105,7 @@ maximalCycleM v
 -- __Note:__ It is assumed the input vector consists of distinct values.
 --
 -- This uses the "early refusal" algorithm.
-derangement :: forall a g. (Eq a, RandomGen g) => Vector a -> g -> (Vector a, g)
+derangement :: forall a g v . (Eq a, RandomGen g, Vector v a) => v a -> g -> (v a, g)
 derangement v g
   | length v <= 1 = (v, g)
   | otherwise     =
@@ -124,7 +124,7 @@ derangement v g
 -- __Note:__ It is assumed the input vector consists of distinct values.
 --
 -- This uses the "early refusal" algorithm.
-derangementM :: forall m a . (Eq a, MonadRandom m, PrimMonad m) => Vector a -> m (Vector a)
+derangementM :: forall m a v . (Eq a, MonadRandom m, PrimMonad m, Vector v a) => v a -> m (v a)
 derangementM v
   | length v <= 1 = pure v
   | otherwise =
