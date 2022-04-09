@@ -77,7 +77,7 @@ Library
                     -fexpose-all-unfoldings
                     -fspecialise-aggressively
 
-  build-depends:    base        >= 4.9      && < 4.15
+  build-depends:    base        >= 4.9      && < 4.17
                   , MonadRandom >= 0.5.1.1  && < 0.6
                   , primitive   >= 0.6.4    && < 0.8
                   , random      >= 1.1      && < 1.3
