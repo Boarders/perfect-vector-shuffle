@@ -78,10 +78,10 @@ Library
                     -fspecialise-aggressively
 
   build-depends:    base        >= 4.9      && < 4.19
-                  , MonadRandom >= 0.5.1.1  && < 0.6
-                  , primitive   >= 0.6.4    && < 0.8
+                  , MonadRandom >= 0.5.1.1  && < 0.7
+                  , primitive   >= 0.6.4    && < 0.9
                   , random      >= 1.1      && < 1.3
-                  , vector      >= 0.12.0   && < 0.13
+                  , vector      >= 0.12.0   && < 0.14
 
   exposed-modules:  Immutable.Shuffle
                     Mutable.Shuffle
